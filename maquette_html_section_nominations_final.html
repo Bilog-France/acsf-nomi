@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Espace personnel — Nominations (Maquette)</title>
+  <style>
+    :root{
+      --red:#ef5350;           /* header dégradé haut */
+      --red2:#f36a5a;          /* header dégradé bas  */
+      --blue:#1976d2;          /* bleu primaire */
+      --blue-600:#1565c0;
+      --blue-100:#e3f2fd;
+      --sidebar:#0f58a8;       /* fond item actif */
+      --sidebar-text:#fff;
+      --bg:#f6f7fb;            /* fond général */
+      --card:#ffffff;          /* cartes */
+      --muted:#6b7280;         /* texte secondaire */
+      --success:#1b9e77;       /* statut ok */
+      --warning:#f39c12;       /* statut attente */
+      --danger:#e74c3c;        /* statut rejet */
+      --shadow:0 10px 30px rgba(16,24,40,.08);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,"Helvetica Neue",Arial,"Apple Color Emoji","Segoe UI Emoji";color:#0f172a;background:var(--bg)}
+    a{color:var(--blue);text-decoration:none}
+    .app{display:grid;grid-template-rows:56px 1fr;min-height:100vh}
+    /* Header */
+    .topbar{display:flex;align-items:center;gap:14px;padding:0 20px;background:linear-gradient(90deg,var(--red),var(--red2));color:#fff}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:700;font-size:18px}
+    .brand .logo{width:30px;height:30px;border-radius:50%;background:#fff4;display:grid;place-items:center;font-weight:900}
+    .top-actions{margin-left:auto;display:flex;gap:10px}
+    .btn{appearance:none;border:0;border-radius:999px;padding:9px 14px;font-weight:600;background:#fff;color:#e53935}
+    .btn:focus{outline:2px solid #fff5}
+    /* Layout */
+    .layout{display:grid;grid-template-columns:260px 1fr;gap:0}
+    @media (max-width: 980px){.layout{grid-template-columns:1fr}}
+
+    /* Sidebar */
+    .sidebar{background:#fff;padding:14px 0;border-right:1px solid #edf0f4}
+    .menu-title{padding:0 18px 6px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+    .menu{display:flex;flex-direction:column;gap:4px;padding:0 8px}
+    .menu a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;color:#0f172a}
+    .menu a .dot{width:9px;height:9px;border-radius:50%;background:#c7d2fe}
+    .menu a.active{background:var(--blue-100);color:var(--blue);font-weight:700}
+    .menu a.active .dot{background:var(--blue)}
+    .separator{height:1px;background:#eef2f7;margin:10px 16px}
+
+    /* Main */
+    .main{padding:24px}
+    .page-header{display:flex;align-items:end;gap:18px;flex-wrap:wrap}
+    .page-header h1{margin:0;font-size:28px;color:var(--blue)}
+    .sub{color:var(--muted)}
+
+    .toolbar{margin-top:18px;display:flex;gap:12px;flex-wrap:wrap}
+    .btn-primary{background:var(--blue);color:#fff;border-radius:10px;padding:10px 14px;font-weight:700;border:0}
+    .btn-secondary{background:#fff;color:var(--blue);border:1px solid #d0e2ff;border-radius:10px;padding:10px 14px;font-weight:700}
+
+    .filters{margin-top:16px;background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field label{font-size:12px;color:var(--muted)}
+    .field input,.field select{padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;background:#fff}
+    .filters .field{grid-column:span 3}
+    @media (max-width: 1100px){.filters .field{grid-column:span 6}}
+    @media (max-width: 640px){.filters .field{grid-column:span 12}}
+
+    .table-card{margin-top:16px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    table{width:100%;border-collapse:separate;border-spacing:0}
+    thead th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);background:#fbfcfe}
+    th,td{padding:12px 14px;border-bottom:1px solid #eef2f7;text-align:left}
+    tbody tr:hover{background:#fafcff}
+
+    .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:700}
+    .lvl{background:#eef2ff;color:#274bc3}
+    .stat-attente{background:#fff4e5;color:#b36400}
+    .stat-valide{background:#e6f4ea;color:#137333}
+    .stat-danger{background:#fdecea;color:#b42318}
+    .code{font-family:ui-monospace,Menlo,Consolas,monospace;background:#f3f4f6;border-radius:8px;padding:2px 6px}
+
+    .actions{display:flex;gap:8px}
+    .btn-chip{background:#f3f6ff;border:1px solid #dbe6ff;color:#274bc3;padding:6px 10px;border-radius:999px;font-weight:700}
+
+    /* Modale détails (maquette) */
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(3,7,18,.5)}
+    .modal.open{display:flex}
+    .modal-card{width:min(980px,92vw);max-height:88vh;overflow:auto;background:#fff;border-radius:18px;box-shadow:var(--shadow)}
+    .modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid #eef2f7}
+    .modal-body{padding:16px 18px;display:grid;gap:12px}
+    .section{background:#fbfcfe;border:1px solid #eef2f7;border-radius:14px;padding:14px}
+    .section h3{margin:0 0 8px 0;color:#0f58a8}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+    .grid .field{grid-column:span 4}
+    @media (max-width: 900px){.grid .field{grid-column:span 6}}
+    @media (max-width: 560px){.grid .field{grid-column:span 12}}
+
+    .foot{padding:14px 18px;border-top:1px solid #eef2f7;display:flex;gap:10px;justify-content:flex-end}
+  
+    /* Historique (timeline) */
+    .history{display:flex;flex-direction:column;gap:10px}
+    .history-item{position:relative;padding:10px 12px 10px 16px;border:1px solid #eef2f7;border-radius:12px;background:#fff}
+    .history-meta{display:flex;gap:12px;color:var(--muted);font-size:12px;margin-bottom:6px}
+    .history-body{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .history .note{color:#475569}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">◎</div>
+        <span>Espace personnel ACSF</span>
+      </div>
+      <div class="top-actions">
+        <button class="btn" aria-label="menu">≡</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <!-- Sidebar (maquette inspirée de la capture) -->
+      <aside class="sidebar">
+        <div class="menu-title">Navigation</div>
+        <nav class="menu">
+          <a href="#" ><span class="dot"></span>Actualités</a>
+          <a href="#"><span class="dot"></span>Profil et préférences</a>
+          <a href="#"><span class="dot"></span>Documents et infos pratiques</a>
+          <a href="#"><span class="dot"></span>Encouragement des quatre saisons</a>
+          <a href="#"><span class="dot"></span>Vidéos</a>
+          <a href="#"><span class="dot"></span>Étude nationale</a>
+          <a href="#"><span class="dot"></span>Contacter l'ACSF</a>
+          <a href="#"><span class="dot"></span>Contacter le correspondant de ma région</a>
+          <a href="#"><span class="dot"></span>Dons</a>
+          <div class="separator"></div>
+          <a href="#" ><span class="dot"></span>Suivi RDD</a>
+          <a href="#" class="active"><span class="dot"></span>Nominations</a>
+          <a href="#"><span class="dot"></span>Ma région</a>
+          <a href="#"><span class="dot"></span>Organigramme</a>
+          <a href="#"><span class="dot"></span>Visioconférence</a>
+          <a href="#"><span class="dot"></span>Tutoriels</a>
+        </nav>
+      </aside>
+
+      <!-- Main content -->
+      <main class="main">
+        <div class="page-header">
+          <h1>Nominations</h1>
+          <span class="sub">Gestion des nominations (liste, statut, détails)</span>
+        </div>
+
+        <div class="toolbar">
+          <button class="btn-primary" onclick="openModal()">+ Nouvelle nomination</button>
+          <button class="btn-secondary">Exporter</button>
+        </div>
+
+        <!-- Filtres -->
+        <section class="filters" aria-label="Filtres nominations">
+          <div class="field" style="grid-column:span 4">
+            <label>Recherche (Nom, Ville, Code responsabilité…)</label>
+            <input type="search" placeholder="Rechercher…" />
+          </div>
+          <div class="field">
+            <label>Niveau (proposé)</label>
+            <select>
+              <option value="">Tous</option>
+              <option>GP</option>
+              <option>CH</option>
+              <option>CE</option>
+              <option>CG</option>
+              <option>RG</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Statut</label>
+            <select>
+              <option value="">Tous</option>
+              <option>Attente signatures CG</option>
+              <option>Attente validation RG</option>
+              <option>Attente vérification du bureau</option>
+              <option>Validé par Comité</option>
+              <option>Attente signatures RG</option>
+              <option>Attente validation Nationaux</option>
+              <option>À accepter par le nommé</option>
+              <option>Accepté par le nommé</option>
+              <option>Nommé</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Année (date statut)</label>
+            <input id="yearFilter" type="number" placeholder="2025" />
+          </div>
+          <div class="field">
+            <label>Mois (date statut)</label>
+            <select id="monthFilter">
+              <option value="">Tous</option>
+              <option value="01">Janvier</option>
+              <option value="02">Février</option>
+              <option value="03">Mars</option>
+              <option value="04">Avril</option>
+              <option value="05">Mai</option>
+              <option value="06">Juin</option>
+              <option value="07">Juillet</option>
+              <option value="08">Août</option>
+              <option value="09">Septembre</option>
+              <option value="10">Octobre</option>
+              <option value="11">Novembre</option>
+              <option value="12">Décembre</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Département</label>
+            <input type="text" placeholder="75, 13, 33…" />
+          </div>
+          <div class="field">
+            <label>Ville</label>
+            <input type="text" placeholder="Paris, Lyon…" />
+          </div>
+          </section>
+
+        <!-- Tableau liste -->
+        <section class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Ville (Dpt)</th>
+                <th>Resp. actuelle</th>
+                <th>Resp. proposée (code)</th>
+                <th>Niveau</th>
+                <th>Statut</th>
+                <th>Date statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Dupont</td>
+                <td>Claire</td>
+                <td>Paris (75)</td>
+                <td><span class="code">CE</span></td>
+                <td><span class="code">JF-P-CG</span></td>
+                <td><span class="badge lvl">CG</span></td>
+                <td><span class="badge stat-attente">Attente signatures RG</span></td>
+                <td>11/09/2025</td>
+                <td class="actions">
+                  <button class="btn-chip" onclick="openModal('Claire Dupont')">Voir</button>
+                  <button class="btn-chip">Éditer</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Martin</td>
+                <td>Hassan</td>
+                <td>Bordeaux (33)</td>
+                <td><span class="code">CH</span></td>
+                <td><span class="code">F-C-RG</span></td>
+                <td><span class="badge lvl">RG</span></td>
+                <td><span class="badge stat-valide">Validé par Comité</span></td>
+                <td>06/08/2025</td>
+                <td class="actions">
+                  <button class="btn-chip" onclick="openModal('Hassan Martin')">Voir</button>
+                  <button class="btn-chip">Éditer</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Bernard</td>
+                <td>Minh-Anh</td>
+                <td>Lyon (69)</td>
+                <td><span class="code">CG</span></td>
+                <td><span class="code">H-V-CH</span></td>
+                <td><span class="badge lvl">CH</span></td>
+                <td><span class="badge stat-attente">À accepter par le nommé</span></td>
+                <td>21/07/2025</td>
+                <td class="actions">
+                  <button class="btn-chip" onclick="openModal('Minh-Anh Bernard')">Voir</button>
+                  <button class="btn-chip">Éditer</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Aide statuts selon le niveau -->
+        <details class="section" style="margin-top:16px">
+          <summary><strong>Référence statuts par niveau</strong></summary>
+          <div class="grid" style="margin-top:10px">
+            <div class="field" style="grid-column:span 12">
+              <label><strong>GP</strong></label>
+              <div>« Attente signatures CG », « Attente validation RG », « À accepter par le nommé », « Accepté par le nommé », « Nommé »</div>
+            </div>
+            <div class="field" style="grid-column:span 12">
+              <label><strong>CH</strong></label>
+              <div>« Attente signatures CG », « Attente validation RG », « Attente vérification du bureau », « Validé par Comité », « À accepter par le nommé », « Accepté par le nommé », « Nommé »</div>
+            </div>
+            <div class="field" style="grid-column:span 12">
+              <label><strong>CE / CG</strong></label>
+              <div>« Attente signatures RG », « Attente validation Nationaux », « Validé par Comité », « À accepter par le nommé », « Accepté par le nommé », « Nommé »</div>
+            </div>
+          </div>
+        </details>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modale détails / création (maquette) -->
+  <div class="modal" id="modal">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-head">
+        <h2 id="modalTitle">Nouvelle nomination</h2>
+        <button class="btn" onclick="closeModal()">Fermer</button>
+      </div>
+      <div class="modal-body">
+        <!-- A. Informations personnelles -->
+        <section class="section">
+          <h3>A. Informations personnelles</h3>
+          <div class="grid">
+            <div class="field"><label>NOM</label><input placeholder="NOM" /></div>
+            <div class="field"><label>PRÉNOM</label><input placeholder="PRÉNOM" /></div>
+            <div class="field"><label>NOM DE NAISSANCE</label><input placeholder="Nom de naissance" /></div>
+            <div class="field"><label>SITUATION FAMILLE</label>
+              <select>
+                <option value="">—</option>
+                <option>C</option>
+                <option>M</option>
+                <option>V</option>
+              </select>
+            </div>
+            <div class="field"><label>ÂGE</label><input type="number" placeholder="Ex. 34" /></div>
+            <div class="field"><label>VILLE</label><input placeholder="Ville" /></div>
+            <div class="field"><label>Département</label><input placeholder="75, 13…" /></div>
+          </div>
+        </section>
+
+        <!-- B. Responsabilité actuelle -->
+        <section class="section">
+          <h3>B. Responsabilité actuelle</h3>
+          <div class="grid">
+            <div class="field"><label>CH</label><input placeholder="CH" /></div>
+            <div class="field"><label>CE</label><input placeholder="CE" /></div>
+            <div class="field"><label>CG</label><input placeholder="CG" /></div>
+            <div class="field"><label>RG</label><input placeholder="RG" /></div>
+          </div>
+        </section>
+
+        <!-- C. Responsabilité proposée -->
+        <section class="section">
+          <h3>C. Responsabilité proposée à l'intéressé(e)</h3>
+          <div class="grid">
+            <div class="field"><label>RG</label><input placeholder="RG" /></div>
+            <div class="field"><label>CG</label><input placeholder="CG" /></div>
+            <div class="field"><label>CE</label><input placeholder="CE" /></div>
+            <div class="field"><label>CH</label><input placeholder="CH" /></div>
+            <div class="field"><label>GP</label><input placeholder="GP" /></div>
+            <div class="field" style="grid-column:span 6">
+              <label>RESPONSABILITÉ (code Dpt-Type-Niveau)</label>
+              <input placeholder="Ex. JF-P-CG" />
+            </div>
+            <div class="field" style="grid-column:span 12">
+              <label>MOTIVATION</label>
+              <input placeholder="Court texte de motivation…" />
+            </div>
+            <div class="field">
+              <label>DOUBLE FONCTION ?</label>
+              <select id="doubleFn" onchange="toggleDoubleFn()">
+                <option>Non</option>
+                <option>Oui</option>
+              </select>
+            </div>
+            <div class="field" id="doubleFnDetail" style="display:none;grid-column:span 9">
+              <label>Si Oui, préciser laquelle</label>
+              <input placeholder="Fonction complémentaire…" />
+            </div>
+          </div>
+        </section>
+
+        <!-- C'. Précédent responsable -->
+        <section class="section">
+          <h3>D. Précédent responsable</h3>
+          <div class="grid">
+            <div class="field" style="grid-column:span 4"><label>NOM</label><input placeholder="Nom du précédent responsable" /></div>
+            <div class="field" style="grid-column:span 8"><label>Que devient-il/elle ?</label><input placeholder="Court texte…" /></div>
+          </div>
+        </section>
+
+        <!-- E. Statut -->
+        <section class="section">
+          <h3>E. Statut</h3>
+          <div class="grid">
+            <div class="field" style="grid-column:span 6">
+              <label>Niveau (détermine la liste de statuts)</label>
+              <select id="niveau" onchange="syncStatuts()">
+                <option value="">—</option>
+                <option value="GP">GP</option>
+                <option value="CH">CH</option>
+                <option value="CE">CE</option>
+                <option value="CG">CG</option></select>
+            </div>
+            <div class="field" style="grid-column:span 6">
+              <label>Statut</label>
+              <select id="statut"></select>
+            </div>
+            <div class="field" style="grid-column:span 6">
+              <label>Date statut (dernière modification)</label>
+              <input type="date" />
+            </div>
+          </div>
+          <small class="sub">Le champ « Statut » se met à jour selon le « Niveau ».</small>
+        </section>
+        
+        <!-- E. Historique des signatures & validations -->
+        <section class="section" id="historySection" style="display:none">
+          <h3>F. Historique des signatures & validations</h3>
+<div class="history">
+  <div class="history-item">
+    <div class="history-meta">
+      <span class="date">11/09/2025 – 14:22</span>
+      <span class="actor">CG – Secrétaire</span>
+    </div>
+    <div class="history-body">
+      <span class="note"><strong>Signataire :</strong> Sophie Durand</span>
+      <span class="note">Document signé électroniquement (ID #A94F)</span>
+    </div>
+  </div>
+  <div class="history-item">
+    <div class="history-meta">
+      <span class="date">12/09/2025 – 09:05</span>
+      <span class="actor">RG – Responsable régional</span>
+    </div>
+    <div class="history-body">
+      <span class="note"><strong>Signataire :</strong> Karim El Idrissi</span>
+      <span class="note">Dossier conforme</span>
+    </div>
+  </div>
+  <div class="history-item">
+    <div class="history-meta">
+      <span class="date">13/09/2025 – 18:47</span>
+      <span class="actor">Nommé</span>
+    </div>
+    <div class="history-body">
+      <span class="note"><strong>Signataire :</strong> Claire Dupont</span>
+      <span class="note">Accusé réception via portail</span>
+    </div>
+  </div>
+</div>
+        </section>
+
+      </div>
+      <div class="foot">
+        <button class="btn-secondary" onclick="closeModal()">Annuler</button>
+        <button class="btn-primary">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Petite logique de maquette (non persistante)
+    function openModal(name){
+      const m=document.getElementById('modal');
+      m.classList.add('open');
+      if(name){
+        document.getElementById('modalTitle').textContent = 'Détails — ' + name;
+      }else{
+        document.getElementById('modalTitle').textContent = 'Nouvelle nomination';
+      }
+      // Afficher l'historique uniquement en mode "Voir"
+      const hist = document.getElementById('historySection');
+      if(hist){ hist.style.display = name ? 'block' : 'none'; }
+      syncStatuts();
+    }
+    function closeModal(){document.getElementById('modal').classList.remove('open')}
+    function toggleDoubleFn(){
+      const sel = document.getElementById('doubleFn');
+      document.getElementById('doubleFnDetail').style.display = sel.value === 'Oui' ? 'block' : 'none';
+    }
+    function syncStatuts(){
+      const niveau = (document.getElementById('niveau')||{}).value || 'CH'; // défaut visuel
+      const map = {
+        'GP':["Attente signatures CG","Attente validation RG","À accepter par le nommé","Accepté par le nommé","Nommé"],
+        'CH':["Attente validation RG","Attente vérification du bureau","Validé par Comité","À accepter par le nommé","Accepté par le nommé","Nommé"],
+        'CE':["Attente signatures RG","Attente validation Nationaux","Validé par Comité","À accepter par le nommé","Accepté par le nommé","Nommé"],
+        'CG':["Attente signatures RG","Attente validation Nationaux","Validé par Comité","À accepter par le nommé","Accepté par le nommé","Nommé"],
+        // exemple minimal pour RG
+      };
+      const select = document.getElementById('statut');
+      if(!select) return;
+      select.innerHTML = '';
+      (map[niveau]||[]).forEach(s=>{
+        const opt=document.createElement('option');
+        opt.textContent=s; select.appendChild(opt);
+      });
+    }
+  
+    // Filtre dynamique Année / Mois sur le tableau
+    const yearInput = document.querySelector('.filters input[type="number"]');
+    const monthSelect = document.querySelector('.filters select:nth-of-type(2)'); // deuxième select après Année
+    if(yearInput && monthSelect){
+      [yearInput, monthSelect].forEach(el => el.addEventListener('input', filterByDate));
+      [yearInput, monthSelect].forEach(el => el.addEventListener('change', filterByDate));
+    }
+
+    function filterByDate(){
+      const yearVal = yearInput.value.trim();
+      const monthVal = monthSelect.value.trim();
+      const rows = document.querySelectorAll('.table-card tbody tr');
+      rows.forEach(row => {
+        const dateCell = row.cells[7]; // Date statut col
+        if(!dateCell) return;
+        const [d,m,y] = dateCell.textContent.split('/').map(v=>v.trim());
+        let visible = true;
+        if(yearVal && y !== yearVal) visible = false;
+        if(monthVal && m !== monthVal) visible = false;
+        row.style.display = visible ? '' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>
